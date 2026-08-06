@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "landingpage-lead-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENVIRONMENT": "development",
+    "ALLOWED_ORIGINS": "http://localhost:4321,http://127.0.0.1:4321",
+    "TURNSTILE_MODE": "disabled",
+    "NOTIFICATION_PROVIDER": "noop",
+  },
+  "ratelimits": [
+    {
+      "name": "LEAD_RATE_LIMITER",
+      "namespace_id": "1101",
+      "simple": { "limit": 5, "period": 60 },
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 },
+  },
+  "env": {
+    "production": {
+      "name": "landingpage-lead-api-production",
+      "vars": {
+        "ENVIRONMENT": "production",
+        "ALLOWED_ORIGINS": "https://khosihuythao.com",
+        "TURNSTILE_MODE": "enabled",
+        "NOTIFICATION_PROVIDER": "telegram",
+      },
+      "ratelimits": [
+        {
+          "name": "LEAD_RATE_LIMITER",
+          "namespace_id": "1101",
+          "simple": { "limit": 5, "period": 60 },
+        },
+      ],
+    },
+  },
+}

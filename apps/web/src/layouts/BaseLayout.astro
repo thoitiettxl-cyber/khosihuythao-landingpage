@@ -1,0 +1,66 @@
+---
+import { business, hasBusinessPlaceholders } from "../config/business";
+import "../styles/global.css";
+
+interface Props {
+  description: string;
+  title: string;
+}
+
+const { description, title } = Astro.props;
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site)
+  : Astro.url;
+const jsonLd = !hasBusinessPlaceholders
+  ? {
+      "@context": "https://schema.org",
+      "@type": "HardwareStore",
+      name: business.name,
+      legalName: business.legalName,
+      url: business.siteUrl,
+      telephone: business.contacts.map((contact) => contact.phoneDisplay),
+      address: business.address,
+      openingHours: business.openingHours,
+      areaServed: business.serviceArea,
+    }
+  : null;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#12304a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta
+      name="robots"
+      content={hasBusinessPlaceholders ? "noindex,nofollow" : "index,follow"}
+    />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={business.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {
+      jsonLd && (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(jsonLd)}
+        />
+      )
+    }
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+    <slot />
+  </body>
+</html>

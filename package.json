@@ -1,0 +1,28 @@
+{
+  "name": "landingpage",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "build": "pnpm --filter @landingpage/web build && pnpm --filter @landingpage/worker build",
+    "dev": "pnpm --filter @landingpage/web dev",
+    "dev:worker": "pnpm --filter @landingpage/worker dev",
+    "e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings 0 && pnpm format:check",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.62.1",
+    "eslint": "10.8.0",
+    "globals": "17.9.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-astro": "0.14.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.66.0"
+  }
+}

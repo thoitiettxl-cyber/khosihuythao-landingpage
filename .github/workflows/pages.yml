@@ -1,0 +1,60 @@
+name: Deploy website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      DEPLOY_ENV: production
+      PUBLIC_BUSINESS_NAME: KHO SỈ HUY THẢO
+      PUBLIC_LEGAL_NAME: HỘ KINH DOANH NGUYỄN THANH HUY 1
+      PUBLIC_SLOGAN: NHANH GỌN
+      PUBLIC_PHONE_1_DISPLAY: 0964 727 949
+      PUBLIC_PHONE_1_HREF: tel:+84964727949
+      PUBLIC_ZALO_1_URL: https://zalo.me/84964727949
+      PUBLIC_PHONE_2_DISPLAY: 0968 844 385
+      PUBLIC_PHONE_2_HREF: tel:+84968844385
+      PUBLIC_ZALO_2_URL: https://zalo.me/84968844385
+      PUBLIC_ADDRESS: 119/16A Mễ Cốc, Phú Định, TP. Hồ Chí Minh
+      PUBLIC_OPENING_HOURS: Thứ Hai–Thứ Bảy mở cửa từ 08:30, có nghỉ trưa; nghỉ Chủ Nhật
+      PUBLIC_SERVICE_AREA: Giao chành xe toàn quốc; miễn phí giao ra chành xe; có nhận hàng tại kho
+      PUBLIC_SITE_URL: https://khosihuythao.com
+      PUBLIC_BASE_PATH: /
+      PUBLIC_API_URL: ${{ vars.LANDINGPAGE_API_URL }}
+      PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.LANDINGPAGE_TURNSTILE_SITE_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @landingpage/web build
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: apps/web/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

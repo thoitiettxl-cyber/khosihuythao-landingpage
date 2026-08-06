@@ -1,0 +1,22 @@
+{
+  "name": "@landingpage/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "wrangler deploy --dry-run --env=\"\" --outdir dist",
+    "deploy:production": "node scripts/check-production.mjs && wrangler deploy --env production",
+    "dev": "wrangler dev --local",
+    "test": "vitest run",
+    "typecheck": "wrangler types --check && tsc --noEmit"
+  },
+  "dependencies": {
+    "@landingpage/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10",
+    "wrangler": "4.119.0"
+  }
+}

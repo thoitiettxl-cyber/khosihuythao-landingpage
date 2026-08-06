@@ -1,0 +1,22 @@
+{
+  "name": "@landingpage/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/check-business-config.mjs && astro build",
+    "dev": "astro dev",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@landingpage/shared": "workspace:*",
+    "astro": "7.1.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
