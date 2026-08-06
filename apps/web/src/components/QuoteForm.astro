@@ -89,7 +89,7 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
   </div>
   {
     hasTurnstile ? (
-      <div class="cf-turnstile" data-sitekey={business.turnstileSiteKey} />
+      <div id="quote-turnstile" data-sitekey={business.turnstileSiteKey} />
     ) : (
       <p class="preview-note">
         Turnstile đang tắt trong bản phát triển. Production build yêu cầu site
@@ -123,7 +123,7 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
 {
   hasTurnstile && (
     <script
-      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
       is:inline
       async
       defer
@@ -134,8 +134,42 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
 <script>
   import { validateLeadInput } from "@landingpage/shared";
 
+  declare global {
+    interface Window {
+      quoteTurnstileWidgetId?: string;
+      turnstile?: {
+        render: (container: Element, options: { sitekey: string }) => string;
+        reset: (widgetId: string) => void;
+      };
+    }
+  }
+
   const form = document.querySelector<HTMLFormElement>("#quote-form");
   const status = document.querySelector<HTMLElement>("#form-status");
+  const turnstileContainer =
+    document.querySelector<HTMLElement>("#quote-turnstile");
+  const turnstileScript = document.querySelector<HTMLScriptElement>(
+    'script[src*="challenges.cloudflare.com/turnstile"]',
+  );
+
+  function renderTurnstile(): void {
+    const sitekey = turnstileContainer?.dataset.sitekey;
+    if (
+      !turnstileContainer ||
+      !sitekey ||
+      !window.turnstile ||
+      window.quoteTurnstileWidgetId
+    ) {
+      return;
+    }
+    window.quoteTurnstileWidgetId = window.turnstile.render(
+      turnstileContainer,
+      { sitekey },
+    );
+  }
+
+  turnstileScript?.addEventListener("load", renderTurnstile, { once: true });
+  renderTurnstile();
 
   function showFieldErrors(errors: Record<string, string>): void {
     for (const name of ["name", "phone", "message"]) {
@@ -147,6 +181,22 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
       if (output) output.textContent = message;
       if (input) input.setAttribute("aria-invalid", message ? "true" : "false");
     }
+  }
+
+  function apiErrorCode(value: unknown): string | undefined {
+    if (typeof value !== "object" || value === null || !("error" in value)) {
+      return undefined;
+    }
+    const error = value.error;
+    if (typeof error !== "object" || error === null || !("code" in error)) {
+      return undefined;
+    }
+    return typeof error.code === "string" ? error.code : undefined;
+  }
+
+  function resetTurnstile(): void {
+    const widgetId = window.quoteTurnstileWidgetId;
+    if (widgetId && window.turnstile) window.turnstile.reset(widgetId);
   }
 
   form?.addEventListener("submit", (event) => {
@@ -191,6 +241,17 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
           body: JSON.stringify(payload),
         });
         const result: unknown = await response.json();
+        const errorCode = apiErrorCode(result);
+        if (response.status === 429 || errorCode === "RATE_LIMITED") {
+          status.textContent =
+            "Bạn đã gửi nhiều yêu cầu liên tiếp. Vui lòng chờ một phút rồi thử lại.";
+          return;
+        }
+        if (errorCode === "TURNSTILE_FAILED") {
+          status.textContent =
+            "Phiên xác minh đã hết hạn. Vui lòng xác minh lại rồi gửi yêu cầu.";
+          return;
+        }
         if (
           !response.ok ||
           typeof result !== "object" ||
@@ -208,6 +269,7 @@ const hasTurnstile = !business.turnstileSiteKey.includes("TODO");
         status.textContent =
           "Chưa thể gửi yêu cầu. Vui lòng gọi điện hoặc nhắn Zalo để được hỗ trợ.";
       } finally {
+        resetTurnstile();
         if (button) {
           button.disabled = false;
           button.textContent = "Gửi yêu cầu báo giá";

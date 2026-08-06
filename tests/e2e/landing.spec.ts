@@ -60,6 +60,22 @@ test("validates and submits a quote once", async ({ page }) => {
     });
   });
   await page.goto("/#quote");
+  await page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      quoteTurnstileWidgetId?: string;
+      turnstile?: {
+        render: () => string;
+        reset: (widgetId: string) => void;
+      };
+    };
+    testWindow.quoteTurnstileWidgetId = "widget-e2e";
+    testWindow.turnstile = {
+      render: () => "widget-e2e",
+      reset: (widgetId: string) => {
+        document.body.dataset.turnstileReset = widgetId;
+      },
+    };
+  });
   await page.getByRole("button", { name: "Gửi yêu cầu báo giá" }).click();
   await expect(page.locator("#name-error")).not.toBeEmpty();
 
@@ -72,7 +88,32 @@ test("validates and submits a quote once", async ({ page }) => {
   await expect(page.getByRole("status").last()).toContainText(
     "Đã nhận yêu cầu",
   );
+  await expect(page.locator("body")).toHaveAttribute(
+    "data-turnstile-reset",
+    "widget-e2e",
+  );
   expect(requestCount).toBe(1);
+});
+
+test("explains the production rate limit", async ({ page }) => {
+  await page.route("**/api/lead", async (route) => {
+    await route.fulfill({
+      status: 429,
+      contentType: "application/json",
+      body: JSON.stringify({
+        ok: false,
+        error: { code: "RATE_LIMITED", message: "Too many requests." },
+      }),
+    });
+  });
+  await page.goto("/#quote");
+  await page.locator("#name").fill("Nguyễn Văn A");
+  await page.locator("#phone").fill("0912345678");
+  await page.locator("#message").fill("Cần báo giá 20 lưỡi cắt kính.");
+  await page.locator('#quote-form button[type="submit"]').click();
+  await expect(page.locator("#form-status")).toContainText(
+    "Vui lòng chờ một phút",
+  );
 });
 
 test("mobile sticky contact actions remain usable", async ({
