@@ -1,5 +1,10 @@
 import { MAX_LEAD_BYTES, validateLeadInput } from "@landingpage/shared";
-import { errorResponse, isOriginAllowed, jsonResponse } from "./http";
+import {
+  errorResponse,
+  isOriginAllowed,
+  jsonResponse,
+  noContentResponse,
+} from "./http";
 import { createNotificationProvider } from "./notify";
 import { verifyTurnstile } from "./turnstile";
 
@@ -26,7 +31,7 @@ export async function handleRequest(
 
   if (request.method === "OPTIONS") {
     return isOriginAllowed(request, env)
-      ? jsonResponse(request, env, {}, 204)
+      ? noContentResponse(request, env)
       : errorResponse(
           request,
           env,

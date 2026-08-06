@@ -49,6 +49,13 @@ export function jsonResponse(
   return Response.json(body, { status, headers });
 }
 
+export function noContentResponse(request: Request, env: Env): Response {
+  const headers = corsHeaders(request, env);
+  headers.set("Cache-Control", "no-store");
+  headers.set("X-Content-Type-Options", "nosniff");
+  return new Response(null, { status: 204, headers });
+}
+
 export function errorResponse(
   request: Request,
   env: Env,

@@ -57,6 +57,21 @@ describe("lead worker", () => {
     await expect(response.json()).resolves.toMatchObject({ ok: true });
   });
 
+  it("returns an empty successful preflight response", async () => {
+    const response = await handleRequest(
+      new Request("https://api.example/api/lead", {
+        method: "OPTIONS",
+        headers: { Origin: "http://localhost:4321" },
+      }),
+      testEnv(),
+    );
+    expect(response.status).toBe(204);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(
+      "http://localhost:4321",
+    );
+    await expect(response.text()).resolves.toBe("");
+  });
+
   it("accepts a valid lead in local mode", async () => {
     const response = await handleRequest(
       leadRequest(validPayload()),
