@@ -1,1 +1,5 @@
+* text=auto eol=lf
+*.avif -text
+*.jpg -text
+*.webp -text
 apps/worker/worker-configuration.d.ts whitespace=-trailing-space
