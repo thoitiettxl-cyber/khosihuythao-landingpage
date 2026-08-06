@@ -2,22 +2,53 @@
 import QuoteForm from "../components/QuoteForm.astro";
 import ResponsiveImage from "../components/ResponsiveImage.astro";
 import { business, hasBusinessPlaceholders } from "../config/business";
+import { categories } from "../data/categories";
 import { faq } from "../data/faq";
 import { products } from "../data/products";
 import { benefits, orderSteps, trustPoints } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { joinBase } from "../utils/config";
 
-const title = `${business.name} | Kho sỉ vật tư tại TP. Hồ Chí Minh`;
+const title = `${business.name} | Vật tư công trình TP.HCM`;
 const description =
-  "Kho sỉ vật tư, dụng cụ sơn và hàng thi công. Gửi yêu cầu nhanh, nhận tại kho hoặc giao chành xe toàn quốc.";
+  "Kho sỉ vật tư công trình, lưỡi cắt, băng keo và dụng cụ sơn tại TP.HCM. Nhận tại kho hoặc giao chành xe toàn quốc.";
 const gallery = products.map((product) => ({
   image: product.image,
   alt: product.name,
 }));
+const structuredData = [
+  {
+    "@type": "FAQPage",
+    "@id": `${business.siteUrl}/#faq`,
+    mainEntity: faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  },
+  {
+    "@type": "ItemList",
+    "@id": `${business.siteUrl}/#products`,
+    name: "Mặt hàng vật tư tại Kho Sỉ Huy Thảo",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Product",
+        name: product.name,
+        description: product.use,
+        image: `${business.siteUrl}/images/${product.image}-960.webp`,
+        url: `${business.siteUrl}/#products`,
+      },
+    })),
+  },
+];
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout {title} {description} {structuredData}>
   {
     hasBusinessPlaceholders && (
       <div class="preview-banner" role="status">
@@ -51,10 +82,11 @@ const gallery = products.map((product) => ({
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">Kho sỉ vật tư tại TP. Hồ Chí Minh</p>
-          <h1>Hỏi nhanh. Báo giá gọn. Giao chành xe toàn quốc.</h1>
+          <h1>Kho sỉ vật tư công trình và dụng cụ sơn tại TP.HCM</h1>
           <p class="hero-lead">
-            Gửi tên, hình ảnh hoặc quy cách mặt hàng cần tìm. Kho Sỉ Huy Thảo
-            kiểm tra nhu cầu và chủ động liên hệ lại với bạn.
+            Kho Sỉ Huy Thảo cung cấp lưỡi cắt, băng keo, vật tư đóng gói, dụng
+            cụ sơn và phụ kiện thi công. Gửi tên, hình ảnh hoặc quy cách mặt
+            hàng để kho kiểm tra và liên hệ báo giá.
           </p>
           <div class="hero-actions">
             <a class="button button-accent button-large" href="#quote"
@@ -103,6 +135,42 @@ const gallery = products.map((product) => ({
             </p>
           ))
         }
+      </div>
+    </section>
+
+    <section id="categories" class="section" aria-labelledby="categories-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Nhóm hàng bán sỉ</p>
+            <h2 id="categories-title">Vật tư cho thợ và công trình</h2>
+          </div>
+          <p>
+            Kho tại 119/16A Mễ Cốc, Phú Định, TP. Hồ Chí Minh. Hỗ trợ khách mua
+            sỉ, nhận hàng tại kho và giao chành xe toàn quốc.
+          </p>
+        </div>
+        <div class="category-grid">
+          {
+            categories.map((category) => (
+              <article class="category-card">
+                <div class="category-image">
+                  <ResponsiveImage
+                    image={category.image}
+                    alt={`${category.name} tại Kho Sỉ Huy Thảo`}
+                  />
+                </div>
+                <div class="card-body">
+                  <h3>{category.name}</h3>
+                  <p>{category.description}</p>
+                  <a class="text-link" href="#quote">
+                    Yêu cầu báo giá
+                  </a>
+                </div>
+              </article>
+            ))
+          }
+        </div>
       </div>
     </section>
 

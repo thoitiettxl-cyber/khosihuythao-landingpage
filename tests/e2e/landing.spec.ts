@@ -10,7 +10,7 @@ test("renders the landing page without serious browser errors", async ({
   await page.goto("/");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Hỏi nhanh",
+    "Kho sỉ vật tư công trình",
   );
   await expect(
     page.getByRole("heading", { name: "Một số mặt hàng thực tế" }),
@@ -30,6 +30,25 @@ test("renders the landing page without serious browser errors", async ({
     ),
   ).toBe(true);
   expect(errors).toEqual([]);
+});
+
+test("publishes focused wholesale SEO content", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveTitle("KHO SỈ HUY THẢO | Vật tư công trình TP.HCM");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "http://127.0.0.1:4321/",
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /03-warehouse-cartons-x2000-960\.webp/,
+  );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Kho sỉ vật tư công trình",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Vật tư cho thợ và công trình" }),
+  ).toBeVisible();
 });
 
 test("opens and closes the accessible product dialog", async ({ page }) => {

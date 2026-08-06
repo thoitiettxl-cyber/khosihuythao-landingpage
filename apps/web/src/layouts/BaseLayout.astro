@@ -4,24 +4,63 @@ import "../styles/global.css";
 
 interface Props {
   description: string;
+  structuredData?: Record<string, unknown>[];
   title: string;
 }
 
-const { description, title } = Astro.props;
+const { description, structuredData = [], title } = Astro.props;
 const canonical = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url;
+const socialImage = new URL(
+  "/images/03-warehouse-cartons-x2000-960.webp",
+  business.siteUrl,
+);
 const jsonLd = !hasBusinessPlaceholders
   ? {
       "@context": "https://schema.org",
-      "@type": "HardwareStore",
-      name: business.name,
-      legalName: business.legalName,
-      url: business.siteUrl,
-      telephone: business.contacts.map((contact) => contact.phoneDisplay),
-      address: business.address,
-      openingHours: business.openingHours,
-      areaServed: business.serviceArea,
+      "@graph": [
+        {
+          "@type": ["HardwareStore", "LocalBusiness"],
+          "@id": `${business.siteUrl}/#store`,
+          name: business.name,
+          legalName: business.legalName,
+          description,
+          url: business.siteUrl,
+          image: socialImage,
+          telephone: business.contacts.map((contact) =>
+            contact.phoneHref.replace("tel:", ""),
+          ),
+          contactPoint: business.contacts.map((contact) => ({
+            "@type": "ContactPoint",
+            telephone: contact.phoneHref.replace("tel:", ""),
+            contactType: "sales",
+            availableLanguage: "Vietnamese",
+          })),
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "119/16A Mễ Cốc, Phú Định",
+            addressLocality: "TP. Hồ Chí Minh",
+            addressRegion: "Hồ Chí Minh",
+            addressCountry: "VN",
+          },
+          openingHours: business.openingHours,
+          areaServed: {
+            "@type": "Country",
+            name: "Việt Nam",
+          },
+          sameAs: business.contacts.map((contact) => contact.zaloUrl),
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${business.siteUrl}/#website`,
+          url: business.siteUrl,
+          name: business.name,
+          inLanguage: "vi-VN",
+          publisher: { "@id": `${business.siteUrl}/#store` },
+        },
+        ...structuredData,
+      ],
     }
   : null;
 ---
@@ -36,18 +75,24 @@ const jsonLd = !hasBusinessPlaceholders
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta
       name="robots"
-      content={hasBusinessPlaceholders ? "noindex,nofollow" : "index,follow"}
+      content={hasBusinessPlaceholders
+        ? "noindex,nofollow"
+        : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"}
     />
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="vi-VN" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={business.name} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="Hàng vật tư tại Kho Sỉ Huy Thảo" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
     {
       jsonLd && (
         <script
