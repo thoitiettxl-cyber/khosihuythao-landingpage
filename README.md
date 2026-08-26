@@ -16,28 +16,28 @@ tests/e2e         Playwright desktop/mobile smoke tests
 
 ## Chạy local
 
-Yêu cầu Node.js 22.12+ và pnpm 10.
+Yêu cầu Node.js 22.12+ và pnpm 10. Môi trường vận hành chính là Linux Alpine.
 
-```cmd
-cd /d C:\Users\Administrator\Documents\CODEX-GAUNTLET\projects\landingpage
+Từ thư mục gốc repository:
+
+```sh
 pnpm install --frozen-lockfile
-copy .env.example .env
-copy apps\worker\.dev.vars.example apps\worker\.dev.vars
+cp .env.example .env
+cp apps/worker/.dev.vars.example apps/worker/.dev.vars
 pnpm dev
 ```
 
-Mở cửa sổ Command Prompt thứ hai để chạy API local:
+Mở terminal thứ hai để chạy API local:
 
-```cmd
-cd /d C:\Users\Administrator\Documents\CODEX-GAUNTLET\projects\landingpage
+```sh
 pnpm dev:worker
 ```
 
-Thông tin công khai của KHO SỈ HUY THẢO đã được cấu hình trong `.env.example`; API local và Turnstile vẫn dùng giá trị phát triển. Trang tự thêm `noindex,nofollow` và hiển thị cảnh báo khi thiếu API/Turnstile production. Worker local tắt Turnstile và dùng notification `noop`; production không cho phép hai chế độ này.
+Thông tin công khai của KHO SỈ HUY THẢO đã được cấu hình trong `.env.example`; API local và Turnstile vẫn dùng giá trị phát triển. `apps/web` không có `.env.example`. Giá trị công khai trùng fallback trong `apps/web/src/config/business.ts`. `apps/web/scripts/check-business-config.mjs` chỉ đọc `process.env` và chỉ khi `DEPLOY_ENV=production`. Banner/`noindex` bật khi bất kỳ field nào (kể cả `PUBLIC_TURNSTILE_SITE_KEY`) khớp `TODO|example.invalid|09xx|+84...`. Trang tự thêm `noindex,nofollow` và hiển thị cảnh báo khi thiếu API/Turnstile production. Worker local tắt Turnstile và dùng notification `noop`; production không cho phép hai chế độ này.
 
 ## Kiểm chứng
 
-```cmd
+```sh
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -64,17 +64,16 @@ Các binding và biến không nhạy cảm nằm trong `apps/worker/wrangler.js
 1. Xác nhận `ALLOWED_ORIGINS` vẫn là origin frontend chính xác `https://khosihuythao.com`.
 2. Từ `apps/worker`, đặt secret bằng prompt tương tác:
 
-```cmd
+```sh
 pnpm exec wrangler secret put TURNSTILE_SECRET --env production
 pnpm exec wrangler secret put TELEGRAM_BOT_TOKEN --env production
 pnpm exec wrangler secret put TELEGRAM_CHAT_ID --env production
 ```
 
-3. Kiểm tra và deploy:
+3. Kiểm tra và deploy từ thư mục gốc repository (cùng lệnh với `.github/workflows/worker.yml`):
 
-```cmd
-set WORKER_SECRETS_CONFIGURED=true
-pnpm deploy:production
+```sh
+WORKER_SECRETS_CONFIGURED=true pnpm --filter @landingpage/worker deploy:production
 ```
 
 Không truyền secret trên command line. Kiểm tra `/api/health`, gửi một lead thử, rồi xác nhận Telegram trước khi nối frontend production.
