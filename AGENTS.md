@@ -2,9 +2,12 @@
 
 ## Product
 
-Static Astro landing for KHO SỈ HUY THẢO. One job: accept a quote request
-via the on-page form or two Zalo links. Cloudflare Worker exposes
-`/api/health` and `/api/lead`. No cart, login, payment, or live inventory.
+Static Astro landing for KHO SỈ HUY THẢO. One job: help customers find the
+shop online, then call or Zalo the two published numbers. No quote form,
+cart, login, payment, live inventory, or selling prices (prices live in
+KSHT/Giaban, not this site). Cloudflare Worker `/api/health` and `/api/lead`
+remain in-repo but are not the landing job; do not decommission them unless
+separately authorized.
 
 Authority: `README.md`.
 
@@ -52,8 +55,8 @@ There is no root `deploy:production` script. Worker production deploy is
 Worker `typecheck` runs `wrangler types && tsc --noEmit` and may rewrite
 committed `apps/worker/worker-configuration.d.ts`.
 
-`pnpm e2e` starts only `@landingpage/web` at `http://127.0.0.1:4321` and
-intercepts `/api/lead`. It does not start the worker.
+`pnpm e2e` starts only `@landingpage/web` at `http://127.0.0.1:4321`. It does
+not start the worker.
 
 Primary operator environment is Linux Alpine (POSIX). CI `verify` still
 runs on `windows-latest`.
@@ -83,8 +86,8 @@ explicit install.
 ## Deploy entry points
 
 - Pages: `.github/workflows/pages.yml` (`workflow_dispatch`,
-  `DEPLOY_ENV=production`, vars `LANDINGPAGE_API_URL` and
-  `LANDINGPAGE_TURNSTILE_SITE_KEY`).
+  `DEPLOY_ENV=production`). Web production does not require
+  `LANDINGPAGE_API_URL` or `LANDINGPAGE_TURNSTILE_SITE_KEY`.
 - Worker: `.github/workflows/worker.yml` (`workflow_dispatch`,
   environment `landingpage-worker-production`).
 

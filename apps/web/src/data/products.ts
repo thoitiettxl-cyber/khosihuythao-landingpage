@@ -1,32 +1,33 @@
 export const products = [
   {
-    name: "Lưỡi cắt KENSSMAN 105 mm",
-    use: "Trao đổi vật liệu cần cắt để kiểm tra lựa chọn phù hợp.",
-    image: "01-kenssman-diamond-blade-105",
+    name: "Lưỡi cắt đa năng Hark Caput",
+    use: "Lưỡi cắt đa năng. Gọi kho để đối chiếu quy cách trước khi lấy.",
+    image: "https://i.postimg.cc/N9SFtcWF/r334.png",
   },
   {
-    name: "Lưỡi cắt KCBO 105 mm",
-    use: "Lưỡi cắt đóng hộp; vui lòng liên hệ để xác nhận công dụng và hàng.",
-    image: "02-kcbo-diamond-wheel-105",
+    name: "Băng keo chống dột X2000",
+    use: "Băng keo chống dột X2000. Nói khổ 5P, 10P, 15P hoặc 20P khi gọi.",
+    image: "https://i.postimg.cc/XYFfBv5G/X2000.png",
   },
   {
-    name: "Băng keo chống thấm X2000",
-    use: "Vật tư dạng cuộn đóng thùng; kiểm tra quy cách trước khi đặt.",
-    image: "03-warehouse-cartons-x2000",
+    name: "Che sơn",
+    use: "Cuộn che sơn. Nói khổ 55 cm, 110 cm hoặc 280 cm.",
+    image:
+      "https://i.postimg.cc/9M042SxJ/z7399828458697-3052d9b53ee58fa7ab36e6ea0f9f101f.jpg",
   },
   {
-    name: "Dây đai cuộn màu cam",
-    use: "Vật tư dạng cuộn phục vụ đóng gói hoặc thi công theo nhu cầu.",
-    image: "04-orange-webbing-rolls",
+    name: "Cọ sơn Minh Thuận loại 1",
+    use: "Cọ sơn Minh Thuận loại 1. Nói kích thước inch khi gọi.",
+    image: "https://i.postimg.cc/7ZgRnx05/Picture1.png",
   },
   {
-    name: "Băng che phủ sơn 110 cm",
-    use: "Hỗ trợ che phủ bề mặt trong quá trình sơn sửa.",
-    image: "05-masking-covering-tape-110cm",
+    name: "Mũi khoan bê tông gài Hark Caput",
+    use: "Mũi khoan bê tông gài. Nói đường kính và chiều dài.",
+    image: "https://i.postimg.cc/n9mzcWxt/r357.png",
   },
   {
-    name: "Cọ, bàn chà và cán nối",
-    use: "Nhóm dụng cụ sơn và phụ kiện cho công việc hoàn thiện.",
-    image: "06-painting-tools",
+    name: "Tô vít Hark Caput 2 đầu",
+    use: "Tô vít 2 đầu. Nói kích thước 6×100, 6×150 hoặc 6×200.",
+    image: "https://i.postimg.cc/21G56vs1/r467.png",
   },
 ] as const;

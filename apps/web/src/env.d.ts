@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_ADDRESS?: string;
-  readonly PUBLIC_API_URL?: string;
   readonly PUBLIC_BASE_PATH?: string;
   readonly PUBLIC_BUSINESS_NAME?: string;
   readonly PUBLIC_LEGAL_NAME?: string;
@@ -14,7 +13,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_SERVICE_AREA?: string;
   readonly PUBLIC_SITE_URL?: string;
   readonly PUBLIC_SLOGAN?: string;
-  readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
   readonly PUBLIC_ZALO_1_URL?: string;
   readonly PUBLIC_ZALO_2_URL?: string;
 }

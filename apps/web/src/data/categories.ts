@@ -1,34 +1,32 @@
 export const categories = [
   {
-    name: "Lưỡi cắt và đá mài",
-    description:
-      "Lưỡi cắt cho kính, gạch và vật liệu phù hợp theo từng quy cách.",
-    image: "01-kenssman-diamond-blade-105",
+    name: "Đĩa cắt / cắt gạch",
+    description: "Lưỡi cắt gạch, đá và đa năng theo đường kính.",
+    image: "https://i.postimg.cc/N9SFtcWF/r334.png",
   },
   {
-    name: "Băng keo và vật tư đóng gói",
-    description:
-      "Băng keo chống thấm, băng che phủ và vật tư phục vụ thi công, đóng gói.",
-    image: "05-masking-covering-tape-110cm",
+    name: "Băng keo",
+    description: "Băng keo chống dột, che sơn và băng điện theo khổ cuộn.",
+    image: "https://i.postimg.cc/XYFfBv5G/X2000.png",
   },
   {
-    name: "Cọ lăn và dụng cụ sơn",
-    description: "Cọ, bàn chà, cán nối và phụ kiện phục vụ sơn sửa.",
-    image: "06-painting-tools",
+    name: "Cọ sơn",
+    description: "Cọ Minh Thuận, Việt Mỹ và cọ thăng long theo inch.",
+    image: "https://i.postimg.cc/7ZgRnx05/Picture1.png",
   },
   {
-    name: "Dụng cụ kim khí",
-    description: "Dụng cụ và phụ kiện thông dụng cho thợ và công trình.",
-    image: "02-kcbo-diamond-wheel-105",
+    name: "Mũi khoan / mũi vít",
+    description: "Mũi khoan bê tông gài và mũi ceramic theo đường kính.",
+    image: "https://i.postimg.cc/n9mzcWxt/r357.png",
   },
   {
-    name: "Thiết bị điện nước",
-    description: "Vật tư điện nước phổ biến theo nhu cầu sửa chữa và thi công.",
-    image: "04-orange-webbing-rolls",
+    name: "Tô vít",
+    description: "Tô vít 2 đầu Hark Caput theo chiều dài cán.",
+    image: "https://i.postimg.cc/21G56vs1/r467.png",
   },
   {
-    name: "Hàng bán sỉ",
-    description: "Hỗ trợ báo giá theo số lượng và quy cách yêu cầu.",
-    image: "03-warehouse-cartons-x2000",
+    name: "Thước",
+    description: "Thước thủy, thước góc và thước cặp. Nói kích thước khi gọi.",
+    image: "https://i.postimg.cc/cvhJHYVb/r453.png",
   },
 ] as const;

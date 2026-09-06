@@ -57,11 +57,6 @@ export const business = {
     import.meta.env.PUBLIC_SITE_URL,
     "https://khosihuythao.com",
   ),
-  apiUrl: publicValue(import.meta.env.PUBLIC_API_URL, "http://localhost:8787"),
-  turnstileSiteKey: publicValue(
-    import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
-    "TODO_TURNSTILE_SITE_KEY",
-  ),
 } as const;
 
 export const hasBusinessPlaceholders = [
@@ -72,8 +67,6 @@ export const hasBusinessPlaceholders = [
   business.openingHours,
   business.serviceArea,
   business.siteUrl,
-  business.apiUrl,
-  business.turnstileSiteKey,
   ...business.contacts.flatMap((contact) => [
     contact.phoneDisplay,
     contact.phoneHref,

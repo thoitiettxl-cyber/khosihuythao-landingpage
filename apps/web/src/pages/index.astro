@@ -1,21 +1,23 @@
 ---
-import QuoteForm from "../components/QuoteForm.astro";
 import ResponsiveImage from "../components/ResponsiveImage.astro";
 import { business, hasBusinessPlaceholders } from "../config/business";
 import { categories } from "../data/categories";
 import { faq } from "../data/faq";
 import { products } from "../data/products";
-import { benefits, orderSteps, trustPoints } from "../data/site";
+import { orderSteps } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { joinBase } from "../utils/config";
 
 const title = `${business.name} | Vật tư công trình TP.HCM`;
 const description =
   "Kho sỉ vật tư công trình, lưỡi cắt, băng keo và dụng cụ sơn tại TP.HCM. Nhận tại kho hoặc giao chành xe toàn quốc.";
-const gallery = products.map((product) => ({
-  image: product.image,
-  alt: product.name,
-}));
+const isRemoteImage = (image: string) =>
+  image.startsWith("https://") || image.startsWith("http://");
+const lightboxSrc = (image: string) =>
+  isRemoteImage(image)
+    ? image
+    : joinBase(import.meta.env.BASE_URL, `/images/${image}-960.webp`);
+const primary = business.contacts[0];
 const structuredData = [
   {
     "@type": "FAQPage",
@@ -40,7 +42,9 @@ const structuredData = [
         "@type": "Product",
         name: product.name,
         description: product.use,
-        image: `${business.siteUrl}/images/${product.image}-960.webp`,
+        image: isRemoteImage(product.image)
+          ? product.image
+          : `${business.siteUrl}/images/${product.image}-960.webp`,
         url: `${business.siteUrl}/#products`,
       },
     })),
@@ -70,9 +74,15 @@ const structuredData = [
           ></span
         >
       </a>
+      <nav class="primary-nav" aria-label="Mục trang">
+        <a href="#categories">Nhóm hàng</a>
+        <a href="#products">Hàng thực tế</a>
+        <a href="#faq">Hỏi đáp</a>
+      </nav>
       <div class="header-actions">
-        <a class="text-link" href="#products">Xem hàng thực tế</a>
-        <a class="button button-accent" href="#quote">Gửi yêu cầu</a>
+        <a class="button button-accent" href={primary.phoneHref}
+          >Gọi {primary.phoneDisplay}</a
+        >
       </div>
     </div>
   </header>
@@ -81,73 +91,87 @@ const structuredData = [
     <section id="top" class="hero section">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Kho sỉ vật tư tại TP. Hồ Chí Minh</p>
-          <h1>Kho sỉ vật tư công trình và dụng cụ sơn tại TP.HCM</h1>
+          <h1>
+            <span class="hero-line">Kho sỉ vật tư công trình</span>
+            <span class="hero-line hero-line-soft">Dụng cụ sơn tại TP.HCM</span>
+          </h1>
           <p class="hero-lead">
-            Kho Sỉ Huy Thảo cung cấp lưỡi cắt, băng keo, vật tư đóng gói, dụng
-            cụ sơn và phụ kiện thi công. Gửi tên, hình ảnh hoặc quy cách mặt
-            hàng để kho kiểm tra và liên hệ báo giá.
+            Lưỡi cắt, băng keo, cọ sơn và dụng cụ. Gọi số trên trang — kho đối
+            chiếu hàng thật rồi báo giá.
           </p>
-          <div class="hero-actions">
-            <a class="button button-accent button-large" href="#quote"
-              >Gửi yêu cầu báo giá</a
-            >
-            {
-              business.contacts.map((contact) => (
-                <a
-                  class="button button-navy button-large"
-                  href={contact.zaloUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Zalo {contact.phoneDisplay}
-                </a>
-              ))
-            }
+          <div class="hero-contact">
+            <p class="hero-contact-label">Gọi kho</p>
+            <div class="hero-actions">
+              {
+                business.contacts.map((contact) => (
+                  <a
+                    class="button button-accent button-large"
+                    href={contact.phoneHref}
+                  >
+                    Gọi {contact.phoneDisplay}
+                  </a>
+                ))
+              }
+            </div>
+            <p class="hero-zalo">
+              {
+                business.contacts.map((contact) => (
+                  <a
+                    class="text-link"
+                    href={contact.zaloUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Zalo {contact.phoneDisplay}
+                  </a>
+                ))
+              }
+            </p>
           </div>
-          <p class="service-note">
-            <strong>{business.serviceArea}</strong>
-          </p>
         </div>
         <div class="hero-visual">
-          <ResponsiveImage
-            image="03-warehouse-cartons-x2000"
-            alt="Các thùng vật tư X2000 trong kho"
-            eager
-            sizes="(max-width: 760px) 92vw, 46vw"
-          />
-          <div class="hero-badge">
-            <strong>Hàng tại kho</strong><span
-              >Liên hệ trước khi đến lấy hàng</span
-            >
-          </div>
+          <figure class="hero-shot hero-shot-main">
+            <ResponsiveImage
+              image="03-warehouse-cartons-x2000"
+              alt="Các thùng vật tư X2000 trong kho"
+              eager
+              sizes="(max-width: 760px) 92vw, 46vw"
+            />
+          </figure>
+          <figure class="hero-shot hero-shot-side">
+            <ResponsiveImage
+              image="01-kenssman-diamond-blade-105"
+              alt="Lưỡi cắt kim cương 105 mm tại kho"
+              sizes="(max-width: 760px) 42vw, 22vw"
+            />
+          </figure>
+          <p class="hero-badge">
+            <strong>Hàng tại kho</strong>
+            <span>Liên hệ trước khi đến lấy hàng</span>
+          </p>
         </div>
       </div>
     </section>
 
-    <section class="trust-strip" aria-label="Điểm hỗ trợ">
-      <div class="container trust-grid">
-        {
-          trustPoints.map((point, index) => (
-            <p>
-              <span aria-hidden="true">0{index + 1}</span>
-              {point}
-            </p>
-          ))
-        }
-      </div>
-    </section>
+    <p class="warehouse-line">
+      <span class="container warehouse-line-inner">
+        <strong>{business.address}</strong>
+        <span>{business.openingHours}</span>
+        <span>{business.serviceArea}</span>
+      </span>
+    </p>
 
-    <section id="categories" class="section" aria-labelledby="categories-title">
+    <section
+      id="categories"
+      class="section catalog-section"
+      aria-labelledby="categories-title"
+    >
       <div class="container">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Nhóm hàng bán sỉ</p>
-            <h2 id="categories-title">Vật tư cho thợ và công trình</h2>
-          </div>
+          <h2 id="categories-title">Vật tư cho thợ và công trình</h2>
           <p>
-            Kho tại 119/16A Mễ Cốc, Phú Định, TP. Hồ Chí Minh. Hỗ trợ khách mua
-            sỉ, nhận hàng tại kho và giao chành xe toàn quốc.
+            Kho tại {business.address}. Mua sỉ, nhận tại kho hoặc giao chành xe
+            toàn quốc.
           </p>
         </div>
         <div class="category-grid">
@@ -163,9 +187,6 @@ const structuredData = [
                 <div class="card-body">
                   <h3>{category.name}</h3>
                   <p>{category.description}</p>
-                  <a class="text-link" href="#quote">
-                    Yêu cầu báo giá
-                  </a>
                 </div>
               </article>
             ))
@@ -176,109 +197,38 @@ const structuredData = [
 
     <section
       id="products"
-      class="section section-tinted"
+      class="section catalog-section"
       aria-labelledby="products-title"
     >
       <div class="container">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Hình ảnh tại kho</p><h2 id="products-title">
-              Một số mặt hàng thực tế
-            </h2>
-          </div>
+          <h2 id="products-title">Một số mặt hàng thực tế</h2>
           <p>
-            Hình ảnh dùng để minh họa hàng kho. Không tự động liên kết bảng giá
-            hoặc suy đoán tồn kho.
+            Ảnh hàng đang có tại kho. Không hiện giá trên trang. Bấm ảnh để
+            phóng to, rồi gọi số trên trang.
           </p>
         </div>
         <div class="product-grid">
           {
             products.map((product) => (
               <article class="product-card">
-                <div class="product-image">
+                <button
+                  class="product-shot"
+                  type="button"
+                  data-lightbox-src={lightboxSrc(product.image)}
+                  data-lightbox-alt={product.name}
+                  aria-label={`Mở ảnh lớn: ${product.name}`}
+                >
                   <ResponsiveImage image={product.image} alt={product.name} />
-                </div>
-                <div class="card-body">
-                  <p class="status-chip">Ảnh minh họa thực tế</p>
-                  <>
-                    <h3>{product.name}</h3>
-                    <p>{product.use}</p>
-                  </>
-                  <div class="product-footer">
-                    <>
-                      <strong>Cần mặt hàng tương tự?</strong>
-                      <a class="icon-link" href="#quote">
-                        Gửi yêu cầu <span aria-hidden="true">→</span>
-                      </a>
-                    </>
-                  </div>
-                </div>
-              </article>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <section id="policy" class="section" aria-labelledby="benefits-title">
-      <div class="container benefit-layout">
-        <div class="benefit-intro">
-          <p class="eyebrow">Hỗ trợ thực tế</p><h2 id="benefits-title">
-            Một yêu cầu, một mục tiêu rõ ràng
-          </h2><p>
-            Để lại thông tin để kho chủ động liên hệ, hoặc chọn đúng số Zalo nếu
-            bạn cần gửi ảnh sản phẩm.
-          </p><a class="button button-navy" href="#quote">Nhận tư vấn</a>
-        </div>
-        <div class="benefit-grid">
-          {
-            benefits.map((benefit, index) => (
-              <article>
-                <>
-                  <span aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <h3>{benefit.title}</h3>
-                  <p>{benefit.text}</p>
-                </>
-              </article>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <section class="section gallery-section" aria-labelledby="gallery-title">
-      <div class="container">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Kho &amp; hàng hóa</p><h2 id="gallery-title">
-              Xem gần hơn sản phẩm thực tế
-            </h2>
-          </div><p>
-            Chọn một hình để mở bản lớn. Ảnh gốc được giữ nguyên nhãn sản phẩm.
-          </p>
-        </div>
-        <div class="gallery-grid">
-          {
-            gallery.map((item) => (
-              <button
-                class="gallery-item"
-                type="button"
-                data-lightbox-src={joinBase(
-                  import.meta.env.BASE_URL,
-                  `/images/${item.image}-960.webp`,
-                )}
-                data-lightbox-alt={item.alt}
-                aria-label={`Mở ảnh lớn: ${item.alt}`}
-              >
-                <>
-                  <ResponsiveImage image={item.image} alt={item.alt} />
                   <span>
                     Xem ảnh <span aria-hidden="true">↗</span>
                   </span>
-                </>
-              </button>
+                </button>
+                <div class="card-body">
+                  <h3>{product.name}</h3>
+                  <p>{product.use}</p>
+                </div>
+              </article>
             ))
           }
         </div>
@@ -286,29 +236,21 @@ const structuredData = [
     </section>
 
     <section
-      id="delivery"
-      class="section process-section"
-      aria-labelledby="process-title"
+      id="deal"
+      class="section deal-section"
+      aria-labelledby="deal-title"
     >
       <div class="container">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Quy trình</p><h2 id="process-title">
-              Gửi nhu cầu trong 3 bước
-            </h2>
-          </div><p>
-            Không cần tài khoản và không thanh toán trên landing page.
-          </p>
+          <h2 id="deal-title">Gọi kho rồi nhận hàng</h2>
+          <p>Không tài khoản, không thanh toán trên trang.</p>
         </div>
-        <ol class="process-grid">
+        <ol class="deal-steps">
           {
             orderSteps.map((step) => (
               <li>
-                <>
-                  <span>{step.number}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
-                </>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
               </li>
             ))
           }
@@ -316,42 +258,17 @@ const structuredData = [
       </div>
     </section>
 
-    <section
-      id="quote"
-      class="section quote-section"
-      aria-labelledby="quote-title"
-    >
-      <div class="container quote-layout">
-        <div class="quote-copy">
-          <p class="eyebrow">Yêu cầu báo giá</p><h2 id="quote-title">
-            Cho cửa hàng biết bạn đang cần gì
-          </h2><p>
-            Cung cấp tên hoặc mô tả sản phẩm, số lượng và khu vực nhận hàng. Kho
-            sẽ chủ động liên hệ theo số điện thoại bạn cung cấp.
-          </p><ul>
-            <li>Không yêu cầu thanh toán trên form.</li><li>
-              Thông tin chỉ dùng để phản hồi yêu cầu của bạn.
-            </li><li>Form được bảo vệ chống spam bằng Cloudflare Turnstile.</li>
-          </ul>
-        </div>
-        <QuoteForm />
-      </div>
-    </section>
-
-    <section class="section faq-section" aria-labelledby="faq-title">
+    <section class="section faq-section" aria-labelledby="faq-title" id="faq">
       <div class="container faq-layout">
         <div>
-          <p class="eyebrow">Câu hỏi thường gặp</p><h2 id="faq-title">
-            Thông tin trước khi liên hệ
-          </h2>
-        </div><div class="faq-list">
+          <h2 id="faq-title">Thông tin trước khi liên hệ</h2>
+        </div>
+        <div class="faq-list">
           {
             faq.map((item) => (
               <details>
-                <>
-                  <summary>{item.question}</summary>
-                  <p>{item.answer}</p>
-                </>
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
               </details>
             ))
           }
@@ -368,20 +285,22 @@ const structuredData = [
             ><strong>{business.name}</strong><small>{business.slogan}</small
             ></span
           ></a
-        ><p>{business.legalName}</p><p>Kho sỉ vật tư — phục vụ nhanh gọn.</p>
+        >
+        <p>{business.legalName}</p>
+        <p>Kho sỉ vật tư — phục vụ nhanh gọn.</p>
       </div>
       <div>
         <h2>Liên hệ</h2>
         {
           business.contacts.map((contact) => (
             <p class="footer-contact">
-              <a href={contact.phoneHref}>{contact.phoneDisplay}</a>
+              <a href={contact.phoneHref}>Gọi {contact.phoneDisplay}</a>
               <a
                 href={contact.zaloUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Zalo
+                Zalo {contact.phoneDisplay}
               </a>
             </p>
           ))
@@ -389,16 +308,16 @@ const structuredData = [
         <p>{business.address}</p>
       </div>
       <div>
-        <h2>Hoạt động</h2><p>{business.openingHours}</p><p>
-          {business.serviceArea}
-        </p>
+        <h2>Hoạt động</h2>
+        <p>{business.openingHours}</p>
+        <p>{business.serviceArea}</p>
       </div>
       <div id="privacy">
-        <h2>Quyền riêng tư</h2><p>
-          Họ tên, số điện thoại và nội dung yêu cầu được chuyển qua Telegram cho {
-            business.legalName
-          } để liên hệ lại. Dữ liệu không dùng để bán hoặc quảng cáo cho bên thứ ba.
-          Khách có thể gọi một trong hai số trên để yêu cầu sửa hoặc xóa thông tin.
+        <h2>Quyền riêng tư</h2>
+        <p>
+          Trang không thu form liên hệ. Số điện thoại và Zalo trên trang dùng để
+          khách chủ động gọi {business.legalName}. Không bán dữ liệu cho bên thứ
+          ba.
         </p>
       </div>
     </div>
@@ -411,17 +330,13 @@ const structuredData = [
   </footer>
 
   <div class="mobile-cta" aria-label="Liên hệ nhanh">
-    <a
-      href={business.contacts[0].zaloUrl}
-      target="_blank"
-      rel="noopener noreferrer">Zalo 1</a
-    >
-    <a
-      href={business.contacts[1].zaloUrl}
-      target="_blank"
-      rel="noopener noreferrer">Zalo 2</a
-    >
-    <a href="#quote">Báo giá</a>
+    {
+      business.contacts.map((contact) => (
+        <a class="call" href={contact.phoneHref}>
+          Gọi {contact.phoneDisplay}
+        </a>
+      ))
+    }
   </div>
 
   <dialog
@@ -430,24 +345,27 @@ const structuredData = [
     aria-labelledby="dialog-title"
   >
     <div class="dialog-header">
-      <h2 id="dialog-title">Ảnh sản phẩm</h2><button
-        type="button"
-        data-dialog-close
-        aria-label="Đóng ảnh">×</button
-      >
+      <h2 id="dialog-title">Ảnh sản phẩm</h2>
+      <button type="button" data-dialog-close aria-label="Đóng ảnh">×</button>
     </div>
-    <img src="" alt="" width="960" height="960" />
+    <img
+      src="/images/03-warehouse-cartons-x2000-960.webp"
+      alt=""
+      width="960"
+      height="960"
+    />
   </dialog>
 
   <script>
     const dialog = document.querySelector<HTMLDialogElement>("#gallery-dialog");
     const dialogImage = dialog?.querySelector<HTMLImageElement>("img");
+    const idleLightboxSrc = "/images/03-warehouse-cartons-x2000-960.webp";
     document
       .querySelectorAll<HTMLButtonElement>("[data-lightbox-src]")
       .forEach((button) => {
         button.addEventListener("click", () => {
           if (!dialog || !dialogImage) return;
-          dialogImage.src = button.dataset.lightboxSrc ?? "";
+          dialogImage.src = button.dataset.lightboxSrc ?? idleLightboxSrc;
           dialogImage.alt = button.dataset.lightboxAlt ?? "Ảnh sản phẩm";
           dialog.showModal();
         });
@@ -457,6 +375,11 @@ const structuredData = [
       ?.addEventListener("click", () => dialog.close());
     dialog?.addEventListener("click", (event) => {
       if (event.target === dialog) dialog.close();
+    });
+    dialog?.addEventListener("close", () => {
+      if (!dialogImage) return;
+      dialogImage.src = idleLightboxSrc;
+      dialogImage.alt = "";
     });
   </script>
 </BaseLayout>

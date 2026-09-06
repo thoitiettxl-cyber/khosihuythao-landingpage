@@ -12,8 +12,6 @@ const required = [
   "PUBLIC_OPENING_HOURS",
   "PUBLIC_SERVICE_AREA",
   "PUBLIC_SITE_URL",
-  "PUBLIC_API_URL",
-  "PUBLIC_TURNSTILE_SITE_KEY",
 ];
 
 if (process.env.DEPLOY_ENV === "production") {

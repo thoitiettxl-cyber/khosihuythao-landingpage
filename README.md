@@ -1,11 +1,11 @@
-# KHO SỈ HUY THẢO — landing page nhận yêu cầu
+# KHO SỈ HUY THẢO — landing page tìm kho và gọi điện
 
-Trang Astro tĩnh tại `https://khosihuythao.com` dành cho một mục tiêu: nhận yêu cầu khách hàng qua form hoặc hai kênh Zalo. Cloudflare Worker xác thực Turnstile và chuyển lead tới Telegram. Dự án không có giỏ hàng, đăng nhập, thanh toán hoặc dữ liệu tồn kho thời gian thực.
+Trang Astro tĩnh tại `https://khosihuythao.com` dành cho một mục tiêu: khách tìm thấy kho trên internet rồi gọi điện hoặc nhắn Zalo theo hai số trên trang. Không form báo giá, không giá bán, không tồn kho realtime. Cloudflare Worker `/api/lead` (Turnstile → Telegram) vẫn nằm trong repo nhưng không còn là việc của landing; không decommission trừ khi được phép riêng.
 
 ## Kiến trúc
 
 ```text
-apps/web          Astro static site, UI, SEO và form client
+apps/web          Astro static site, UI, SEO và số liên hệ
 apps/worker       Cloudflare Worker /api/health và /api/lead
 packages/shared   schema/normalization dùng chung
 assets-source     6 ảnh JPEG gốc, không chỉnh sửa
@@ -27,13 +27,13 @@ cp apps/worker/.dev.vars.example apps/worker/.dev.vars
 pnpm dev
 ```
 
-Mở terminal thứ hai để chạy API local:
+Landing không cần Worker khi xem trang. Chạy API lead cũ (tùy chọn):
 
 ```sh
 pnpm dev:worker
 ```
 
-Thông tin công khai của KHO SỈ HUY THẢO đã được cấu hình trong `.env.example`; API local và Turnstile vẫn dùng giá trị phát triển. `apps/web` không có `.env.example`. Giá trị công khai trùng fallback trong `apps/web/src/config/business.ts`. `apps/web/scripts/check-business-config.mjs` chỉ đọc `process.env` và chỉ khi `DEPLOY_ENV=production`. Banner/`noindex` bật khi bất kỳ field nào (kể cả `PUBLIC_TURNSTILE_SITE_KEY`) khớp `TODO|example.invalid|09xx|+84...`. Trang tự thêm `noindex,nofollow` và hiển thị cảnh báo khi thiếu API/Turnstile production. Worker local tắt Turnstile và dùng notification `noop`; production không cho phép hai chế độ này.
+Thông tin công khai của KHO SỈ HUY THẢO đã được cấu hình trong `.env.example`. `apps/web` không có `.env.example`. Giá trị công khai trùng fallback trong `apps/web/src/config/business.ts`. `apps/web/scripts/check-business-config.mjs` chỉ đọc `process.env` và chỉ khi `DEPLOY_ENV=production`. Banner/`noindex` bật khi field liên hệ khớp `TODO|example.invalid|09xx|+84...`. Worker local (nếu chạy) tắt Turnstile và dùng notification `noop`.
 
 ## Kiểm chứng
 
@@ -51,15 +51,13 @@ pnpm e2e
 
 - File logo gốc được upload trực tiếp; URL Postimg đã cung cấp không truy cập được từ môi trường build.
 - Giờ đóng cửa và khoảng nghỉ trưa nếu muốn hiển thị chính xác.
-- Turnstile site key/secret cho `khosihuythao.com`.
-- Telegram bot token mới sau khi thu hồi token đã lộ; Telegram chat ID được đặt bằng Worker Secret.
-- URL Worker sau lần deploy đầu tiên.
+- Turnstile/Telegram/URL Worker chỉ cần nếu vận hành lại `/api/lead`; landing hiện tại không đọc các giá trị đó.
 
 Không commit `.env`, `.dev.vars` hoặc secret. Không dùng lại token từng được gửi qua chat/log.
 
 ## Cloudflare Worker
 
-Các binding và biến không nhạy cảm nằm trong `apps/worker/wrangler.jsonc`. Rate limit mặc định là 5 lần gọi mỗi 60 giây trên khóa IP đã băm. Trước khi deploy:
+Worker lead không còn gắn với landing. Các binding và biến không nhạy cảm nằm trong `apps/worker/wrangler.jsonc`. Rate limit mặc định là 5 lần gọi mỗi 60 giây trên khóa IP đã băm. Trước khi deploy Worker (chỉ khi được phép riêng):
 
 1. Xác nhận `ALLOWED_ORIGINS` vẫn là origin frontend chính xác `https://khosihuythao.com`.
 2. Từ `apps/worker`, đặt secret bằng prompt tương tác:
@@ -76,11 +74,11 @@ pnpm exec wrangler secret put TELEGRAM_CHAT_ID --env production
 WORKER_SECRETS_CONFIGURED=true pnpm --filter @landingpage/worker deploy:production
 ```
 
-Không truyền secret trên command line. Kiểm tra `/api/health`, gửi một lead thử, rồi xác nhận Telegram trước khi nối frontend production.
+Không truyền secret trên command line.
 
 ## GitHub Pages
 
-Trong repository độc lập, workflow `.github/workflows/pages.yml` chạy thủ công. Thông tin cửa hàng công khai được cố định trong workflow; hai GitHub Actions Variables còn cần là `LANDINGPAGE_API_URL` và `LANDINGPAGE_TURNSTILE_SITE_KEY`. Workflow đặt `DEPLOY_ENV=production`, vì vậy sẽ dừng trước deploy nếu thiếu một trong hai giá trị.
+Trong repository độc lập, workflow `.github/workflows/pages.yml` chạy thủ công. Thông tin cửa hàng công khai được cố định trong workflow. Web production không yêu cầu `LANDINGPAGE_API_URL` hay `LANDINGPAGE_TURNSTILE_SITE_KEY`.
 
 Worker có workflow thủ công riêng. Đặt `CLOUDFLARE_API_TOKEN` và `CLOUDFLARE_ACCOUNT_ID` trong GitHub Actions Secrets. Các Worker secret nghiệp vụ phải được cấu hình trước bằng Wrangler.
 
@@ -92,4 +90,4 @@ Worker có workflow thủ công riêng. Đặt `CLOUDFLARE_API_TOKEN` và `CLOUD
 
 ## Điều kiện để chứng minh production
 
-Chỉ coi production hoàn thành sau khi: Worker health pass; một lead thử đến đúng Telegram; Turnstile chặn token sai; GitHub Pages phục vụ đúng canonical domain; DNS/HTTPS ổn định; và smoke test desktop/mobile không có lỗi nghiêm trọng. Production build cố ý dừng nếu API URL hoặc Turnstile site key vẫn là placeholder.
+Chỉ coi production landing hoàn thành sau khi: GitHub Pages phục vụ đúng canonical domain; DNS/HTTPS ổn định; hai số điện thoại/`tel:` và Zalo đúng; smoke test desktop/mobile không có lỗi nghiêm trọng. Worker lead/Telegram không còn là điều kiện của landing.
